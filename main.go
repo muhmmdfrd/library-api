@@ -29,6 +29,7 @@ func main() {
         QueryFields: true,
         PropagateUnscoped: true,
     })
+
     if err != nil {
         log.Fatal("Failed to connect to database:", err)
     }
@@ -39,9 +40,12 @@ func main() {
     // repositories
     userRepo := users.NewUserRepo(db)
 
+    // services
+    userService := users.NewUserService(userRepo)
+
     // handlers
-    authHandler := auth.NewAuthHandler(userRepo)
-    userHandler := users.NewUserHandler(userRepo)
+    authHandler := auth.NewAuthHandler(userService)
+    userHandler := users.NewUserHandler(userService)
 
     r := gin.Default()
 

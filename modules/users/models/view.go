@@ -9,4 +9,5 @@ type UserView struct {
 	Address    string `json:"address" gorm:"type:varchar(100);null"`
 	Occupation string `json:"occupation" gorm:"type:varchar(50);null"`
 	RoleID     int    `json:"role_id" gorm:"type:int;not null"`
+	RoleName   string `json:"role_name"`
 }

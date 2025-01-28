@@ -1,7 +1,8 @@
 package models
 
 type UserAdd struct {
-	Code       string `json:"code" gorm:"type:varchar(50);not null"`
+	ID         int    `json:"-"`
+	Code       string `json:"-"`
 	Username   string `json:"username" gorm:"type:varchar(30);not null;unique"`
 	Password   string `json:"password" gorm:"type:varchar(50);not null"`
 	Name       string `json:"name" gorm:"type:varchar(50);not null"`

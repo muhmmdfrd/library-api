@@ -17,7 +17,6 @@ type User struct {
 	CreatedAt  time.Time `json:"created_at" gorm:"type:datetime;not null;default:CURRENT_TIMESTAMP"`
 	UpdatedBy  int       `json:"updated_by" gorm:"type:int;not null;default:1"`
 	UpdatedAt  time.Time `json:"updated_at" gorm:"type:datetime;not null;default:CURRENT_TIMESTAMP"`
-	DeletedAt time.Time  `json:"deleted_at" gorm:"type:datetime;null"`
 
 	Role Role `gorm:"foreignKey:RoleID"`
 }

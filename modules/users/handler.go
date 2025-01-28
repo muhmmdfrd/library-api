@@ -1,8 +1,8 @@
 package users
 
 import (
-	"bytes"
-	"encoding/json"
+	"library-api/modules/users/models"
+	"library-api/utils"
 	"net/http"
 
 	"library-api/models/responses"
@@ -11,33 +11,43 @@ import (
 )
 
 type UserHandler struct {
-    userRepo UserRepo
+	userService UserService
 }
 
-func NewUserHandler(userRepo UserRepo) *UserHandler {
-    return &UserHandler{userRepo: userRepo}
+func NewUserHandler(userService UserService) *UserHandler {
+    return &UserHandler{userService: userService}
 }
 
 func (h *UserHandler) Get(c *gin.Context) {
-    users, err := h.userRepo.Get()
+    filter, err := utils.ParseFilter(c)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, responses.FailedResponse(err.Error()))
+        return
+    }
+    
+    users, err := h.userService.GetPagedUser(filter)
     if err != nil {
         c.JSON(http.StatusInternalServerError, responses.FailedResponse(err.Error()))
         return
     }
 
-    var buf bytes.Buffer
-    encoder := json.NewEncoder(&buf)
-    encoder.Encode(responses.SuccessResponse("success.", users))
-
-    c.Data(http.StatusOK, "application/json", buf.Bytes())
+    c.JSON(http.StatusOK, responses.SuccessResponse("success.", users))
 }
 
 func (h *UserHandler) Post(c *gin.Context) {
-    success, err := h.userRepo.CreateTemp()
-    if err != nil || !success {
+    var add models.UserAdd
+
+	err := c.ShouldBindJSON(&add)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, responses.FailedResponse(err.Error()))
+        return
+	}
+
+    view, err := h.userService.CreateUser(add)
+    if err != nil {
         c.JSON(http.StatusBadRequest, responses.FailedResponse(err.Error()))
         return
     }
 
-    c.JSON(http.StatusCreated, responses.SuccessResponse("Data created.", nil))
+    c.JSON(http.StatusCreated, responses.SuccessResponse("Data created.", view))
 }

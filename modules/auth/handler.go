@@ -11,11 +11,11 @@ import (
 )
 
 type AuthHandler struct {
-    userRepo users.UserRepo
+    userService users.UserService
 }
 
-func NewAuthHandler(userRepo users.UserRepo) *AuthHandler {
-    return &AuthHandler{userRepo: userRepo}
+func NewAuthHandler(userService users.UserService) *AuthHandler {
+    return &AuthHandler{userService: userService}
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
@@ -26,7 +26,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
         return
     }
 
-    user, err := h.userRepo.Auth(request)
+    user, err := h.userService.Auth(request)
     if err != nil {
         c.JSON(http.StatusUnauthorized, responses.FailedResponse("Invalid credentials."))
         return
