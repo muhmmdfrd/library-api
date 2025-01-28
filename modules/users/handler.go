@@ -1,6 +1,8 @@
 package users
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 
 	"library-api/models/responses"
@@ -12,7 +14,7 @@ type UserHandler struct {
     userRepo UserRepo
 }
 
-func NewAuthHandler(userRepo UserRepo) *UserHandler {
+func NewUserHandler(userRepo UserRepo) *UserHandler {
     return &UserHandler{userRepo: userRepo}
 }
 
@@ -23,7 +25,11 @@ func (h *UserHandler) Get(c *gin.Context) {
         return
     }
 
-    c.JSON(http.StatusOK, responses.SuccessResponse("success.", users))
+    var buf bytes.Buffer
+    encoder := json.NewEncoder(&buf)
+    encoder.Encode(responses.SuccessResponse("success.", users))
+
+    c.Data(http.StatusOK, "application/json", buf.Bytes())
 }
 
 func (h *UserHandler) Post(c *gin.Context) {
