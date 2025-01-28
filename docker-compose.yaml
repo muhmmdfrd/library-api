@@ -1,0 +1,65 @@
+services:
+  app:
+    build: .
+    container_name: library-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    networks:
+      - app_network
+
+  db:
+    image: mariadb:11.6.2
+    container_name: library-db
+    environment:
+      MYSQL_ROOT_PASSWORD: "bBHk!x%j7S^mQFYcUZrckSvHJ!wHygH!ZQrr&dt"
+      MYSQL_DATABASE: library
+    ports:
+      - "15302:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u root",
+          "-p bBHk!x%j7S^mQFYcUZrckSvHJ!wHygH!ZQrr&dt",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+  redis:
+    image: redis:alpine
+    container_name: library-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - redis-data:/data
+    networks:
+      - app_network
+
+volumes:
+  mariadb-data:
+  redis-data:
+
+networks:
+  app_network:
+    driver: bridge
