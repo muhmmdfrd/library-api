@@ -7,9 +7,9 @@ import (
 )
 
 func SetupAuthRoutes(r *gin.Engine, handler *AuthHandler) {
-    authRoutes := r.Group("/auth")
+    authRoutes := r.Group("/api/v1/auth")
     {
-        authRoutes.POST("/login", handler.Login)
+        authRoutes.POST("/", handler.Login)
         authRoutes.POST("/logout", middleware.AuthMiddleware(), handler.Logout)
     }
 }
