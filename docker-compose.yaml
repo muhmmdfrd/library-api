@@ -22,21 +22,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "bBHk!x%j7S^mQFYcUZrckSvHJ!wHygH!ZQrr&dt"
       MYSQL_DATABASE: library
-    ports:
-      - "15302:3306"
     volumes:
       - mariadb-data:/var/lib/mysql
     healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-u root",
-          "-p bBHk!x%j7S^mQFYcUZrckSvHJ!wHygH!ZQrr&dt",
-        ]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
       timeout: 5s
       retries: 5
