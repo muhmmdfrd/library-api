@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
@@ -32,6 +33,7 @@ func main() {
         log.Fatal("Failed to connect to database:", err)
     }
 
+    // redis
     utils.InitRedis()
 
     // repositories
@@ -39,9 +41,12 @@ func main() {
 
     // handlers
     authHandler := auth.NewAuthHandler(userRepo)
-    userHandler := users.NewAuthHandler(userRepo)
+    userHandler := users.NewUserHandler(userRepo)
 
     r := gin.Default()
+
+    // gzip compression
+    r.Use(gzip.Gzip(gzip.BestSpeed))
 
     auth.SetupAuthRoutes(r, authHandler)
     users.SetupUserRoutes(r, userHandler)
