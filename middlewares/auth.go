@@ -1,6 +1,7 @@
-package middleware
+package middlewares
 
 import (
+	"library-api/models/responses"
 	"library-api/utils"
 	"net/http"
 	"strings"
@@ -12,7 +13,7 @@ func AuthMiddleware() gin.HandlerFunc {
     return func(c *gin.Context) {
         authHeader := c.GetHeader("Authorization")
         if authHeader == "" {
-            c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
+            c.JSON(http.StatusUnauthorized, responses.FailedResponse("Authorization header required."))
             c.Abort()
             return
         }
@@ -20,14 +21,14 @@ func AuthMiddleware() gin.HandlerFunc {
         tokenString := strings.Split(authHeader, " ")[1]
         claims, err := utils.ValidateToken(tokenString)
         if err != nil {
-            c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+            c.JSON(http.StatusUnauthorized, responses.FailedResponse("Invalid token."))
             c.Abort()
             return
         }
 
         sessionToken, err := utils.GetSession(c.Request.Context(), claims.UserID)
         if err != nil || sessionToken != tokenString {
-            c.JSON(http.StatusUnauthorized, gin.H{"error": "Session expired or invalid"})
+            c.JSON(http.StatusUnauthorized, responses.FailedResponse("Invalid session."))
             c.Abort()
             return
         }
